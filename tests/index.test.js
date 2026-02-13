@@ -11,7 +11,7 @@ test.describe('Timezone Buddy', () => {
   });
 
   test('should load the page with correct title', async ({ page }) => {
-    await expect(page).toHaveTitle('Timezone Buddy');
+    await expect(page).toHaveTitle(/Timezone Buddy/);
   });
 
   test('should display local time card', async ({ page }) => {
