@@ -531,8 +531,8 @@
 
     <div class="settings">
       <div class="mode-tabs">
-        <button class="mode-tab active" data-mode="live" onclick="setMode('live')">Live</button>
-        <button class="mode-tab" data-mode="convert" onclick="setMode('convert')">Convert</button>
+        <button type="button" class="mode-tab active" data-mode="live" onclick="setMode('live')">Live</button>
+        <button type="button" class="mode-tab" data-mode="convert" onclick="setMode('convert')">Convert</button>
       </div>
       <label class="toggle">
         <span>24hr</span>
@@ -592,7 +592,7 @@
           <input type="hidden" id="timezone">
           <div class="autocomplete-list" id="autocomplete"></div>
         </div>
-        <button class="btn btn-primary" onclick="addTeammate()">Add</button>
+        <button type="button" class="btn btn-primary" onclick="addTeammate()">Add</button>
       </div>
     </div>
 
@@ -1049,7 +1049,7 @@
             <div class="date">${formatShortDate(now, tm.timezone)}</div>
             <div class="offset">${getOffsetDiff(tm.timezone)}</div>
           </div>
-          <button class="remove-btn" onclick="removeTeammate(${i})" title="Remove">✕</button>
+          <button type="button" class="remove-btn" onclick="removeTeammate(${i})" title="Remove">✕</button>
         </div>
       `).join('');
     }
