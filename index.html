@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timezone Buddy</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-hover: #334155;
+      --accent: #38bdf8;
+      --accent-dim: #0ea5e9;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --danger: #f87171;
+      --success: #4ade80;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .time-cards {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .local-time {
+      background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      flex: 1;
+    }
+
+    .utc-time {
+      background: var(--surface);
+      border: 1px solid var(--surface-hover);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      flex: 1;
+    }
+
+    .utc-time .time {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    .utc-time .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .utc-time .date {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .time-cards.hide-utc .utc-time {
+      display: none;
+    }
+
+    .time-cards.hide-utc .local-time {
+      flex: none;
+      width: 100%;
+    }
+
+    .local-time .label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 0.25rem;
+    }
+
+    .local-time .time {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .local-time .date {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+
+    .local-time .timezone {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+    }
+
+    .add-form {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--surface-hover);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      align-self: flex-end;
+      margin-top: auto;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dim);
+    }
+
+    .teammates {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .teammate {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .teammate-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .teammate-name {
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .teammate-tz {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .teammate-time {
+      text-align: right;
+    }
+
+    .teammate-time .time {
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .teammate-time .date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .teammate-time .offset {
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-top: 0.15rem;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      font-size: 1.1rem;
+    }
+
+    .remove-btn:hover {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .settings {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .toggle:hover {
+      color: var(--text);
+    }
+
+    .toggle input {
+      display: none;
+    }
+
+    .toggle-switch {
+      width: 36px;
+      height: 20px;
+      background: var(--surface-hover);
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .toggle input:checked + .toggle-switch {
+      background: var(--accent-dim);
+    }
+
+    .toggle input:checked + .toggle-switch::after {
+      transform: translateX(16px);
+      background: var(--text);
+    }
+
+    @media (max-width: 480px) {
+      .time-cards {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-row {
+        flex-direction: column;
+      }
+      
+      .btn-primary {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--surface-hover);
+      border-radius: 8px;
+      margin-top: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+
+    .autocomplete-list.show {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 0.6rem 0.75rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background: var(--surface-hover);
+    }
+
+    .autocomplete-item:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+
+    .autocomplete-item:last-child {
+      border-radius: 0 0 8px 8px;
+    }
+
+    .autocomplete-item:only-child {
+      border-radius: 8px;
+    }
+
+    .autocomplete-item .city-name {
+      font-weight: 500;
+    }
+
+    .autocomplete-item .country {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--surface-hover);
+    }
+
+    .mode-tabs {
+      display: flex;
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .mode-tab {
+      padding: 0.4rem 0.75rem;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .mode-tab:hover {
+      color: var(--text);
+    }
+
+    .mode-tab.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .convert-controls {
+      display: none;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .convert-controls.show {
+      display: block;
+    }
+
+    .convert-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .convert-input-group {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .convert-input-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .convert-input-group input,
+    .convert-input-group select {
+      width: 100%;
+    }
+
+    .promo {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .promo a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .promo a:hover {
+      text-decoration: underline;
+    }
+
+    .coffee-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: #ffdd00;
+      color: #0d0d0d;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .coffee-btn:hover {
+      background: #e6c700;
+    }
+
+    .coffee-btn:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌍 Timezone Buddy</h1>
+      <p class="subtitle">See your team's local time at a glance</p>
+    </header>
+
+    <div class="settings">
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="live" onclick="setMode('live')">Live</button>
+        <button class="mode-tab" data-mode="convert" onclick="setMode('convert')">Convert</button>
+      </div>
+      <label class="toggle">
+        <span>Show UTC</span>
+        <input type="checkbox" id="showUtc" onchange="toggleUtc()">
+        <span class="toggle-switch"></span>
+      </label>
+    </div>
+
+    <div class="convert-controls" id="convertControls">
+      <div class="convert-row">
+        <div class="convert-input-group">
+          <label for="convertTime">Time</label>
+          <input type="time" id="convertTime" value="09:00">
+        </div>
+        <div class="convert-input-group">
+          <label for="convertDate">Date</label>
+          <input type="date" id="convertDate">
+        </div>
+        <div class="convert-input-group">
+          <label for="convertTzMode">From</label>
+          <select id="convertTzMode">
+            <option value="local">My local time</option>
+            <option value="utc">UTC</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-cards hide-utc" id="timeCards">
+      <div class="local-time">
+        <div class="label">Your Local Time</div>
+        <div class="time" id="localTime">--:--:--</div>
+        <div class="date" id="localDate">---</div>
+        <div class="timezone" id="localTz">---</div>
+      </div>
+      <div class="utc-time">
+        <div class="label">UTC</div>
+        <div class="time" id="utcTime">--:--:--</div>
+        <div class="date" id="utcDate">---</div>
+      </div>
+    </div>
+
+    <div class="add-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="e.g., Sarah" autocomplete="off">
+        </div>
+        <div class="form-group" style="position: relative;">
+          <label for="cityInput">City</label>
+          <input type="text" id="cityInput" placeholder="e.g., London" autocomplete="off">
+          <input type="hidden" id="timezone">
+          <div class="autocomplete-list" id="autocomplete"></div>
+        </div>
+        <button class="btn btn-primary" onclick="addTeammate()">Add</button>
+      </div>
+    </div>
+
+    <div class="section-title">Team</div>
+    <div class="teammates" id="teammates">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <p>Add teammates to see their local time</p>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p class="promo">Need a focus timer? Try <a href="https://aedades.github.io/pomodoro" target="_blank" rel="noopener noreferrer">Pomo Pal</a> 🍅</p>
+      <a href="https://buymeacoffee.com/aedades" target="_blank" rel="noopener noreferrer" class="coffee-btn">
+        ☕ Buy me a coffee
+      </a>
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'timezone-buddy-teammates';
+    const UTC_PREF_KEY = 'timezone-buddy-show-utc';
+    
+    let currentMode = 'live';
+    
+    // City to timezone mapping
+    const CITIES = [
+      // North America
+      { city: 'New York', country: 'US', tz: 'America/New_York' },
+      { city: 'Los Angeles', country: 'US', tz: 'America/Los_Angeles' },
+      { city: 'Chicago', country: 'US', tz: 'America/Chicago' },
+      { city: 'Houston', country: 'US', tz: 'America/Chicago' },
+      { city: 'Phoenix', country: 'US', tz: 'America/Phoenix' },
+      { city: 'Philadelphia', country: 'US', tz: 'America/New_York' },
+      { city: 'San Antonio', country: 'US', tz: 'America/Chicago' },
+      { city: 'San Diego', country: 'US', tz: 'America/Los_Angeles' },
+      { city: 'Dallas', country: 'US', tz: 'America/Chicago' },
+      { city: 'San Francisco', country: 'US', tz: 'America/Los_Angeles' },
+      { city: 'Austin', country: 'US', tz: 'America/Chicago' },
+      { city: 'Seattle', country: 'US', tz: 'America/Los_Angeles' },
+      { city: 'Denver', country: 'US', tz: 'America/Denver' },
+      { city: 'Boston', country: 'US', tz: 'America/New_York' },
+      { city: 'Atlanta', country: 'US', tz: 'America/New_York' },
+      { city: 'Miami', country: 'US', tz: 'America/New_York' },
+      { city: 'Portland', country: 'US', tz: 'America/Los_Angeles' },
+      { city: 'Las Vegas', country: 'US', tz: 'America/Los_Angeles' },
+      { city: 'Detroit', country: 'US', tz: 'America/Detroit' },
+      { city: 'Minneapolis', country: 'US', tz: 'America/Chicago' },
+      { city: 'Honolulu', country: 'US', tz: 'Pacific/Honolulu' },
+      { city: 'Anchorage', country: 'US', tz: 'America/Anchorage' },
+      { city: 'Toronto', country: 'CA', tz: 'America/Toronto' },
+      { city: 'Vancouver', country: 'CA', tz: 'America/Vancouver' },
+      { city: 'Montreal', country: 'CA', tz: 'America/Toronto' },
+      { city: 'Calgary', country: 'CA', tz: 'America/Edmonton' },
+      { city: 'Edmonton', country: 'CA', tz: 'America/Edmonton' },
+      { city: 'Ottawa', country: 'CA', tz: 'America/Toronto' },
+      { city: 'Mexico City', country: 'MX', tz: 'America/Mexico_City' },
+      { city: 'Guadalajara', country: 'MX', tz: 'America/Mexico_City' },
+      { city: 'Monterrey', country: 'MX', tz: 'America/Monterrey' },
+      { city: 'Tijuana', country: 'MX', tz: 'America/Tijuana' },
+      
+      // South America
+      { city: 'São Paulo', country: 'BR', tz: 'America/Sao_Paulo' },
+      { city: 'Sao Paulo', country: 'BR', tz: 'America/Sao_Paulo' },
+      { city: 'Rio de Janeiro', country: 'BR', tz: 'America/Sao_Paulo' },
+      { city: 'Buenos Aires', country: 'AR', tz: 'America/Argentina/Buenos_Aires' },
+      { city: 'Lima', country: 'PE', tz: 'America/Lima' },
+      { city: 'Bogotá', country: 'CO', tz: 'America/Bogota' },
+      { city: 'Bogota', country: 'CO', tz: 'America/Bogota' },
+      { city: 'Santiago', country: 'CL', tz: 'America/Santiago' },
+      { city: 'Caracas', country: 'VE', tz: 'America/Caracas' },
+      
+      // Europe
+      { city: 'London', country: 'GB', tz: 'Europe/London' },
+      { city: 'Paris', country: 'FR', tz: 'Europe/Paris' },
+      { city: 'Berlin', country: 'DE', tz: 'Europe/Berlin' },
+      { city: 'Madrid', country: 'ES', tz: 'Europe/Madrid' },
+      { city: 'Barcelona', country: 'ES', tz: 'Europe/Madrid' },
+      { city: 'Rome', country: 'IT', tz: 'Europe/Rome' },
+      { city: 'Milan', country: 'IT', tz: 'Europe/Rome' },
+      { city: 'Amsterdam', country: 'NL', tz: 'Europe/Amsterdam' },
+      { city: 'Brussels', country: 'BE', tz: 'Europe/Brussels' },
+      { city: 'Vienna', country: 'AT', tz: 'Europe/Vienna' },
+      { city: 'Zurich', country: 'CH', tz: 'Europe/Zurich' },
+      { city: 'Geneva', country: 'CH', tz: 'Europe/Zurich' },
+      { city: 'Stockholm', country: 'SE', tz: 'Europe/Stockholm' },
+      { city: 'Copenhagen', country: 'DK', tz: 'Europe/Copenhagen' },
+      { city: 'Oslo', country: 'NO', tz: 'Europe/Oslo' },
+      { city: 'Helsinki', country: 'FI', tz: 'Europe/Helsinki' },
+      { city: 'Dublin', country: 'IE', tz: 'Europe/Dublin' },
+      { city: 'Lisbon', country: 'PT', tz: 'Europe/Lisbon' },
+      { city: 'Warsaw', country: 'PL', tz: 'Europe/Warsaw' },
+      { city: 'Prague', country: 'CZ', tz: 'Europe/Prague' },
+      { city: 'Budapest', country: 'HU', tz: 'Europe/Budapest' },
+      { city: 'Athens', country: 'GR', tz: 'Europe/Athens' },
+      { city: 'Bucharest', country: 'RO', tz: 'Europe/Bucharest' },
+      { city: 'Moscow', country: 'RU', tz: 'Europe/Moscow' },
+      { city: 'St Petersburg', country: 'RU', tz: 'Europe/Moscow' },
+      { city: 'Istanbul', country: 'TR', tz: 'Europe/Istanbul' },
+      { city: 'Kyiv', country: 'UA', tz: 'Europe/Kyiv' },
+      { city: 'Kiev', country: 'UA', tz: 'Europe/Kyiv' },
+      
+      // Middle East
+      { city: 'Dubai', country: 'AE', tz: 'Asia/Dubai' },
+      { city: 'Abu Dhabi', country: 'AE', tz: 'Asia/Dubai' },
+      { city: 'Tel Aviv', country: 'IL', tz: 'Asia/Tel_Aviv' },
+      { city: 'Jerusalem', country: 'IL', tz: 'Asia/Jerusalem' },
+      { city: 'Riyadh', country: 'SA', tz: 'Asia/Riyadh' },
+      { city: 'Doha', country: 'QA', tz: 'Asia/Qatar' },
+      { city: 'Kuwait City', country: 'KW', tz: 'Asia/Kuwait' },
+      { city: 'Bahrain', country: 'BH', tz: 'Asia/Bahrain' },
+      { city: 'Tehran', country: 'IR', tz: 'Asia/Tehran' },
+      
+      // Africa
+      { city: 'Cairo', country: 'EG', tz: 'Africa/Cairo' },
+      { city: 'Lagos', country: 'NG', tz: 'Africa/Lagos' },
+      { city: 'Johannesburg', country: 'ZA', tz: 'Africa/Johannesburg' },
+      { city: 'Cape Town', country: 'ZA', tz: 'Africa/Johannesburg' },
+      { city: 'Nairobi', country: 'KE', tz: 'Africa/Nairobi' },
+      { city: 'Casablanca', country: 'MA', tz: 'Africa/Casablanca' },
+      { city: 'Accra', country: 'GH', tz: 'Africa/Accra' },
+      
+      // South Asia
+      { city: 'Mumbai', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Delhi', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'New Delhi', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Bangalore', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Bengaluru', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Hyderabad', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Chennai', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Kolkata', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Pune', country: 'IN', tz: 'Asia/Kolkata' },
+      { city: 'Karachi', country: 'PK', tz: 'Asia/Karachi' },
+      { city: 'Lahore', country: 'PK', tz: 'Asia/Karachi' },
+      { city: 'Islamabad', country: 'PK', tz: 'Asia/Karachi' },
+      { city: 'Dhaka', country: 'BD', tz: 'Asia/Dhaka' },
+      { city: 'Colombo', country: 'LK', tz: 'Asia/Colombo' },
+      
+      // Southeast Asia
+      { city: 'Singapore', country: 'SG', tz: 'Asia/Singapore' },
+      { city: 'Bangkok', country: 'TH', tz: 'Asia/Bangkok' },
+      { city: 'Jakarta', country: 'ID', tz: 'Asia/Jakarta' },
+      { city: 'Bali', country: 'ID', tz: 'Asia/Makassar' },
+      { city: 'Kuala Lumpur', country: 'MY', tz: 'Asia/Kuala_Lumpur' },
+      { city: 'Manila', country: 'PH', tz: 'Asia/Manila' },
+      { city: 'Ho Chi Minh City', country: 'VN', tz: 'Asia/Ho_Chi_Minh' },
+      { city: 'Hanoi', country: 'VN', tz: 'Asia/Ho_Chi_Minh' },
+      
+      // East Asia
+      { city: 'Tokyo', country: 'JP', tz: 'Asia/Tokyo' },
+      { city: 'Osaka', country: 'JP', tz: 'Asia/Tokyo' },
+      { city: 'Seoul', country: 'KR', tz: 'Asia/Seoul' },
+      { city: 'Beijing', country: 'CN', tz: 'Asia/Shanghai' },
+      { city: 'Shanghai', country: 'CN', tz: 'Asia/Shanghai' },
+      { city: 'Shenzhen', country: 'CN', tz: 'Asia/Shanghai' },
+      { city: 'Guangzhou', country: 'CN', tz: 'Asia/Shanghai' },
+      { city: 'Hong Kong', country: 'HK', tz: 'Asia/Hong_Kong' },
+      { city: 'Taipei', country: 'TW', tz: 'Asia/Taipei' },
+      
+      // Oceania
+      { city: 'Sydney', country: 'AU', tz: 'Australia/Sydney' },
+      { city: 'Melbourne', country: 'AU', tz: 'Australia/Melbourne' },
+      { city: 'Brisbane', country: 'AU', tz: 'Australia/Brisbane' },
+      { city: 'Perth', country: 'AU', tz: 'Australia/Perth' },
+      { city: 'Adelaide', country: 'AU', tz: 'Australia/Adelaide' },
+      { city: 'Auckland', country: 'NZ', tz: 'Pacific/Auckland' },
+      { city: 'Wellington', country: 'NZ', tz: 'Pacific/Auckland' },
+      
+      // Special
+      { city: 'UTC', country: '', tz: 'UTC' },
+    ];
+
+    let teammates = [];
+
+    let selectedCity = null;
+    let activeIdx = -1;
+
+    function init() {
+      setupCityAutocomplete();
+      loadTeammates();
+      loadUtcPref();
+      updateAllTimes();
+      setInterval(updateAllTimes, 1000);
+      
+      // Allow Enter to add
+      document.getElementById('name').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTeammate();
+      });
+
+      // Close autocomplete on outside click
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.form-group')) {
+          hideAutocomplete();
+        }
+      });
+
+      // Set default date to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('convertDate').value = today;
+
+      // Listen for convert input changes
+      document.getElementById('convertTime').addEventListener('input', updateAllTimes);
+      document.getElementById('convertDate').addEventListener('input', updateAllTimes);
+      document.getElementById('convertTzMode').addEventListener('change', updateAllTimes);
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.mode === mode);
+      });
+      document.getElementById('convertControls').classList.toggle('show', mode === 'convert');
+      updateAllTimes();
+    }
+
+    function getDisplayTime() {
+      if (currentMode === 'live') {
+        return new Date();
+      }
+      
+      const timeVal = document.getElementById('convertTime').value;
+      const dateVal = document.getElementById('convertDate').value;
+      const tzMode = document.getElementById('convertTzMode').value;
+      
+      if (!timeVal || !dateVal) return new Date();
+      
+      const [hours, minutes] = timeVal.split(':').map(Number);
+      const [year, month, day] = dateVal.split('-').map(Number);
+      
+      if (tzMode === 'utc') {
+        // Create date from UTC components
+        return new Date(Date.UTC(year, month - 1, day, hours, minutes));
+      } else {
+        // Create date from local components
+        return new Date(year, month - 1, day, hours, minutes);
+      }
+    }
+
+    function loadUtcPref() {
+      const showUtc = localStorage.getItem(UTC_PREF_KEY) === 'true';
+      document.getElementById('showUtc').checked = showUtc;
+      document.getElementById('timeCards').classList.toggle('hide-utc', !showUtc);
+    }
+
+    function toggleUtc() {
+      const showUtc = document.getElementById('showUtc').checked;
+      localStorage.setItem(UTC_PREF_KEY, showUtc);
+      document.getElementById('timeCards').classList.toggle('hide-utc', !showUtc);
+    }
+
+    function setupCityAutocomplete() {
+      const input = document.getElementById('cityInput');
+      const list = document.getElementById('autocomplete');
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+        selectedCity = null;
+        activeIdx = -1;
+
+        if (query.length < 1) {
+          hideAutocomplete();
+          return;
+        }
+
+        const matches = CITIES.filter(c => 
+          c.city.toLowerCase().startsWith(query) ||
+          c.city.toLowerCase().includes(query)
+        ).slice(0, 8);
+
+        if (matches.length === 0) {
+          hideAutocomplete();
+          return;
+        }
+
+        // Sort: starts-with first, then contains
+        matches.sort((a, b) => {
+          const aStarts = a.city.toLowerCase().startsWith(query);
+          const bStarts = b.city.toLowerCase().startsWith(query);
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+          return a.city.localeCompare(b.city);
+        });
+
+        list.innerHTML = matches.map((c, i) => `
+          <div class="autocomplete-item" data-idx="${i}" data-tz="${c.tz}" data-city="${c.city}">
+            <span class="city-name">${escapeHtml(c.city)}</span>
+            <span class="country">${c.country}</span>
+          </div>
+        `).join('');
+
+        list.classList.add('show');
+
+        // Click handler for items
+        list.querySelectorAll('.autocomplete-item').forEach(item => {
+          item.addEventListener('click', () => selectCity(item));
+        });
+      });
+
+      input.addEventListener('keydown', (e) => {
+        const items = list.querySelectorAll('.autocomplete-item');
+        if (!list.classList.contains('show') || items.length === 0) {
+          if (e.key === 'Enter') addTeammate();
+          return;
+        }
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          activeIdx = Math.min(activeIdx + 1, items.length - 1);
+          updateActiveItem(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          activeIdx = Math.max(activeIdx - 1, 0);
+          updateActiveItem(items);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (activeIdx >= 0) {
+            selectCity(items[activeIdx]);
+          }
+          addTeammate();
+        } else if (e.key === 'Escape') {
+          hideAutocomplete();
+        }
+      });
+    }
+
+    function updateActiveItem(items) {
+      items.forEach((item, i) => {
+        item.classList.toggle('active', i === activeIdx);
+      });
+    }
+
+    function selectCity(item) {
+      const city = item.dataset.city;
+      const tz = item.dataset.tz;
+      document.getElementById('cityInput').value = city;
+      document.getElementById('timezone').value = tz;
+      selectedCity = { city, tz };
+      hideAutocomplete();
+    }
+
+    function hideAutocomplete() {
+      document.getElementById('autocomplete').classList.remove('show');
+      activeIdx = -1;
+    }
+
+    function formatTime(date, tz) {
+      return date.toLocaleTimeString('en-US', {
+        timeZone: tz,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    function formatDate(date, tz) {
+      return date.toLocaleDateString('en-US', {
+        timeZone: tz,
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function formatShortDate(date, tz) {
+      return date.toLocaleDateString('en-US', {
+        timeZone: tz,
+        weekday: 'short'
+      });
+    }
+
+    function getOffsetDiff(tz) {
+      const now = new Date();
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      const localOffset = getTimezoneOffset(now, localTz);
+      const targetOffset = getTimezoneOffset(now, tz);
+      const diffMinutes = targetOffset - localOffset;
+      const diffHours = diffMinutes / 60;
+      
+      if (diffHours === 0) return 'Same time';
+      const sign = diffHours > 0 ? '+' : '';
+      const label = Math.abs(diffHours) === 1 ? 'hr' : 'hrs';
+      return `${sign}${diffHours} ${label}`;
+    }
+
+    function getTimezoneOffset(date, tz) {
+      const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+      const tzDate = new Date(date.toLocaleString('en-US', { timeZone: tz }));
+      return (tzDate - utcDate) / 60000;
+    }
+
+    function updateAllTimes() {
+      const displayTime = getDisplayTime();
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      document.getElementById('localTime').textContent = formatTime(displayTime, localTz);
+      document.getElementById('localDate').textContent = formatDate(displayTime, localTz);
+      document.getElementById('localTz').textContent = localTz.replace(/_/g, ' ');
+      
+      // Update UTC
+      document.getElementById('utcTime').textContent = formatTime(displayTime, 'UTC');
+      document.getElementById('utcDate').textContent = formatDate(displayTime, 'UTC');
+      
+      teammates.forEach((tm, i) => {
+        const timeEl = document.querySelector(`[data-idx="${i}"] .time`);
+        const dateEl = document.querySelector(`[data-idx="${i}"] .date`);
+        if (timeEl) timeEl.textContent = formatTime(displayTime, tm.timezone);
+        if (dateEl) dateEl.textContent = formatShortDate(displayTime, tm.timezone);
+      });
+    }
+
+    function renderTeammates() {
+      const container = document.getElementById('teammates');
+      
+      if (teammates.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            <p>Add teammates to see their local time</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const now = new Date();
+      container.innerHTML = teammates.map((tm, i) => `
+        <div class="teammate" data-idx="${i}">
+          <div class="teammate-info">
+            <div class="teammate-name">${escapeHtml(tm.name)}</div>
+            <div class="teammate-tz">${tm.timezone.replace(/_/g, ' ')}</div>
+          </div>
+          <div class="teammate-time">
+            <div class="time">${formatTime(now, tm.timezone)}</div>
+            <div class="date">${formatShortDate(now, tm.timezone)}</div>
+            <div class="offset">${getOffsetDiff(tm.timezone)}</div>
+          </div>
+          <button class="remove-btn" onclick="removeTeammate(${i})" title="Remove">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function addTeammate() {
+      const nameInput = document.getElementById('name');
+      const cityInput = document.getElementById('cityInput');
+      const tzInput = document.getElementById('timezone');
+      
+      const name = nameInput.value.trim();
+      let timezone = tzInput.value;
+      
+      if (!name) {
+        nameInput.focus();
+        return;
+      }
+
+      // If no city selected via autocomplete, try to match typed text
+      if (!timezone && cityInput.value.trim()) {
+        const query = cityInput.value.trim().toLowerCase();
+        const match = CITIES.find(c => c.city.toLowerCase() === query);
+        if (match) {
+          timezone = match.tz;
+        }
+      }
+      
+      if (!timezone) {
+        cityInput.focus();
+        return;
+      }
+      
+      teammates.push({ name, timezone });
+      saveTeammates();
+      renderTeammates();
+      
+      nameInput.value = '';
+      cityInput.value = '';
+      tzInput.value = '';
+      selectedCity = null;
+      nameInput.focus();
+    }
+
+    function removeTeammate(idx) {
+      teammates.splice(idx, 1);
+      saveTeammates();
+      renderTeammates();
+    }
+
+    function saveTeammates() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(teammates));
+    }
+
+    function loadTeammates() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          teammates = JSON.parse(saved);
+        }
+      } catch (e) {
+        teammates = [];
+      }
+      renderTeammates();
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    init();
+  </script>
+</body>
+</html>

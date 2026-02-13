@@ -1,0 +1,16 @@
+{
+  "name": "timezone-buddy",
+  "version": "1.0.0",
+  "description": "See your team's local time at a glance",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "serve": "python3 -m http.server 8890"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.41.0"
+  },
+  "keywords": ["timezone", "remote-work", "team"],
+  "author": "aedades",
+  "license": "MIT"
+}
