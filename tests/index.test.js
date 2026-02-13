@@ -23,7 +23,7 @@ test.describe('Timezone Buddy', () => {
 
   test('should toggle UTC display', async ({ page }) => {
     const utcCard = page.locator('.utc-time');
-    const toggle = page.locator('#showUtc');
+    const toggle = page.locator('label:has(#showUtc)');
     
     // UTC hidden by default
     await expect(utcCard).not.toBeVisible();
