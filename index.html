@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timezone Buddy - See Your Team's Local Time at a Glance</title>
-  
+
   <!-- SEO Meta Tags -->
   <meta name="description" content="Free timezone converter for remote teams. See everyone's local time at a glance, convert meeting times across timezones, and coordinate with teammates worldwide.">
   <meta name="keywords" content="timezone converter, world clock, remote work, team time zones, meeting scheduler, time zone calculator, international time">
   <meta name="author" content="aedades">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://aedades.github.io/timezone-buddy/">
-  
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://aedades.github.io/timezone-buddy/">
@@ -20,18 +20,18 @@
   <meta property="og:image" content="https://aedades.github.io/timezone-buddy/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://aedades.github.io/timezone-buddy/">
   <meta name="twitter:title" content="Timezone Buddy - See Your Team's Local Time at a Glance">
   <meta name="twitter:description" content="Free timezone converter for remote teams. See everyone's local time at a glance and coordinate meetings worldwide.">
   <meta name="twitter:image" content="https://aedades.github.io/timezone-buddy/og-image.png">
-  
+
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  
+
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
@@ -53,7 +53,7 @@
     }
   }
   </script>
-  
+
   <style>
     :root {
       --bg: #0f172a;
@@ -403,7 +403,7 @@
       .form-row {
         flex-direction: column;
       }
-      
+
       .btn-primary {
         width: 100%;
         margin-top: 0.5rem;
@@ -669,10 +669,10 @@
     const STORAGE_KEY = 'timezone-buddy-teammates';
     const UTC_PREF_KEY = 'timezone-buddy-show-utc';
     const TIME_FORMAT_KEY = 'timezone-buddy-24hr';
-    
+
     let currentMode = 'live';
     let use24hr = false;
-    
+
     // City to timezone mapping
     const CITIES = [
       // North America
@@ -708,7 +708,7 @@
       { city: 'Guadalajara', country: 'MX', tz: 'America/Mexico_City' },
       { city: 'Monterrey', country: 'MX', tz: 'America/Monterrey' },
       { city: 'Tijuana', country: 'MX', tz: 'America/Tijuana' },
-      
+
       // South America
       { city: 'São Paulo', country: 'BR', tz: 'America/Sao_Paulo' },
       { city: 'Sao Paulo', country: 'BR', tz: 'America/Sao_Paulo' },
@@ -719,7 +719,7 @@
       { city: 'Bogota', country: 'CO', tz: 'America/Bogota' },
       { city: 'Santiago', country: 'CL', tz: 'America/Santiago' },
       { city: 'Caracas', country: 'VE', tz: 'America/Caracas' },
-      
+
       // Europe
       { city: 'London', country: 'GB', tz: 'Europe/London' },
       { city: 'Paris', country: 'FR', tz: 'Europe/Paris' },
@@ -749,7 +749,7 @@
       { city: 'Istanbul', country: 'TR', tz: 'Europe/Istanbul' },
       { city: 'Kyiv', country: 'UA', tz: 'Europe/Kyiv' },
       { city: 'Kiev', country: 'UA', tz: 'Europe/Kyiv' },
-      
+
       // Middle East
       { city: 'Dubai', country: 'AE', tz: 'Asia/Dubai' },
       { city: 'Abu Dhabi', country: 'AE', tz: 'Asia/Dubai' },
@@ -760,7 +760,7 @@
       { city: 'Kuwait City', country: 'KW', tz: 'Asia/Kuwait' },
       { city: 'Bahrain', country: 'BH', tz: 'Asia/Bahrain' },
       { city: 'Tehran', country: 'IR', tz: 'Asia/Tehran' },
-      
+
       // Africa
       { city: 'Cairo', country: 'EG', tz: 'Africa/Cairo' },
       { city: 'Lagos', country: 'NG', tz: 'Africa/Lagos' },
@@ -769,7 +769,7 @@
       { city: 'Nairobi', country: 'KE', tz: 'Africa/Nairobi' },
       { city: 'Casablanca', country: 'MA', tz: 'Africa/Casablanca' },
       { city: 'Accra', country: 'GH', tz: 'Africa/Accra' },
-      
+
       // South Asia
       { city: 'Mumbai', country: 'IN', tz: 'Asia/Kolkata' },
       { city: 'Delhi', country: 'IN', tz: 'Asia/Kolkata' },
@@ -785,7 +785,7 @@
       { city: 'Islamabad', country: 'PK', tz: 'Asia/Karachi' },
       { city: 'Dhaka', country: 'BD', tz: 'Asia/Dhaka' },
       { city: 'Colombo', country: 'LK', tz: 'Asia/Colombo' },
-      
+
       // Southeast Asia
       { city: 'Singapore', country: 'SG', tz: 'Asia/Singapore' },
       { city: 'Bangkok', country: 'TH', tz: 'Asia/Bangkok' },
@@ -795,7 +795,7 @@
       { city: 'Manila', country: 'PH', tz: 'Asia/Manila' },
       { city: 'Ho Chi Minh City', country: 'VN', tz: 'Asia/Ho_Chi_Minh' },
       { city: 'Hanoi', country: 'VN', tz: 'Asia/Ho_Chi_Minh' },
-      
+
       // East Asia
       { city: 'Tokyo', country: 'JP', tz: 'Asia/Tokyo' },
       { city: 'Osaka', country: 'JP', tz: 'Asia/Tokyo' },
@@ -806,7 +806,7 @@
       { city: 'Guangzhou', country: 'CN', tz: 'Asia/Shanghai' },
       { city: 'Hong Kong', country: 'HK', tz: 'Asia/Hong_Kong' },
       { city: 'Taipei', country: 'TW', tz: 'Asia/Taipei' },
-      
+
       // Oceania
       { city: 'Sydney', country: 'AU', tz: 'Australia/Sydney' },
       { city: 'Melbourne', country: 'AU', tz: 'Australia/Melbourne' },
@@ -815,7 +815,7 @@
       { city: 'Adelaide', country: 'AU', tz: 'Australia/Adelaide' },
       { city: 'Auckland', country: 'NZ', tz: 'Pacific/Auckland' },
       { city: 'Wellington', country: 'NZ', tz: 'Pacific/Auckland' },
-      
+
       // Special
       { city: 'UTC', country: '', tz: 'UTC' },
     ];
@@ -832,7 +832,7 @@
       load24hrPref();
       updateAllTimes();
       setInterval(updateAllTimes, 1000);
-      
+
       // Allow Enter to add
       document.getElementById('name').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addTeammate();
@@ -868,16 +868,16 @@
       if (currentMode === 'live') {
         return new Date();
       }
-      
+
       const timeVal = document.getElementById('convertTime').value;
       const dateVal = document.getElementById('convertDate').value;
       const tzMode = document.getElementById('convertTzMode').value;
-      
+
       if (!timeVal || !dateVal) return new Date();
-      
+
       const [hours, minutes] = timeVal.split(':').map(Number);
       const [year, month, day] = dateVal.split('-').map(Number);
-      
+
       if (tzMode === 'utc') {
         // Create date from UTC components
         return new Date(Date.UTC(year, month - 1, day, hours, minutes));
@@ -924,7 +924,7 @@
           return;
         }
 
-        const matches = CITIES.filter(c => 
+        const matches = CITIES.filter(c =>
           c.city.toLowerCase().startsWith(query) ||
           c.city.toLowerCase().includes(query)
         ).slice(0, 8);
@@ -1033,12 +1033,12 @@
     function getOffsetDiff(tz) {
       const now = new Date();
       const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
+
       const localOffset = getTimezoneOffset(now, localTz);
       const targetOffset = getTimezoneOffset(now, tz);
       const diffMinutes = targetOffset - localOffset;
       const diffHours = diffMinutes / 60;
-      
+
       if (diffHours === 0) return 'Same time';
       const sign = diffHours > 0 ? '+' : '';
       const label = Math.abs(diffHours) === 1 ? 'hr' : 'hrs';
@@ -1054,15 +1054,15 @@
     function updateAllTimes() {
       const displayTime = getDisplayTime();
       const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
+
       document.getElementById('localTime').textContent = formatTime(displayTime, localTz);
       document.getElementById('localDate').textContent = formatDate(displayTime, localTz);
       document.getElementById('localTz').textContent = localTz.replace(/_/g, ' ');
-      
+
       // Update UTC
       document.getElementById('utcTime').textContent = formatTime(displayTime, 'UTC');
       document.getElementById('utcDate').textContent = formatDate(displayTime, 'UTC');
-      
+
       teammates.forEach((tm, i) => {
         const timeEl = document.querySelector(`[data-idx="${i}"] .time`);
         const dateEl = document.querySelector(`[data-idx="${i}"] .date`);
@@ -1073,7 +1073,7 @@
 
     function renderTeammates() {
       const container = document.getElementById('teammates');
-      
+
       if (teammates.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
@@ -1086,7 +1086,7 @@
         `;
         return;
       }
-      
+
       const now = new Date();
       container.innerHTML = teammates.map((tm, i) => `
         <div class="teammate" data-idx="${i}">
@@ -1108,10 +1108,10 @@
       const nameInput = document.getElementById('name');
       const cityInput = document.getElementById('cityInput');
       const tzInput = document.getElementById('timezone');
-      
+
       const name = nameInput.value.trim();
       let timezone = tzInput.value;
-      
+
       if (!name) {
         nameInput.focus();
         return;
@@ -1125,16 +1125,16 @@
           timezone = match.tz;
         }
       }
-      
+
       if (!timezone) {
         cityInput.focus();
         return;
       }
-      
+
       teammates.push({ name, timezone });
       saveTeammates();
       renderTeammates();
-      
+
       nameInput.value = '';
       cityInput.value = '';
       tzInput.value = '';
