@@ -535,7 +535,12 @@
         <button class="mode-tab" data-mode="convert" onclick="setMode('convert')">Convert</button>
       </div>
       <label class="toggle">
-        <span>Show UTC</span>
+        <span>24hr</span>
+        <input type="checkbox" id="use24hr" onchange="toggle24hr()">
+        <span class="toggle-switch"></span>
+      </label>
+      <label class="toggle">
+        <span>UTC</span>
         <input type="checkbox" id="showUtc" onchange="toggleUtc()">
         <span class="toggle-switch"></span>
       </label>
@@ -603,7 +608,7 @@
     </div>
 
     <footer class="footer">
-      <p class="promo">Need a focus timer? Try <a href="https://aedades.github.io/pomodoro" target="_blank" rel="noopener noreferrer">Pomo Pal</a> 🍅</p>
+      <p class="promo">Need a focus timer? Try <a href="https://pomopal-f14e0.web.app" target="_blank" rel="noopener noreferrer">Pomo Pal</a> 🍅</p>
       <a href="https://buymeacoffee.com/aedades" target="_blank" rel="noopener noreferrer" class="coffee-btn">
         ☕ Buy me a coffee
       </a>
@@ -613,8 +618,10 @@
   <script>
     const STORAGE_KEY = 'timezone-buddy-teammates';
     const UTC_PREF_KEY = 'timezone-buddy-show-utc';
+    const TIME_FORMAT_KEY = 'timezone-buddy-24hr';
     
     let currentMode = 'live';
+    let use24hr = false;
     
     // City to timezone mapping
     const CITIES = [
@@ -772,6 +779,7 @@
       setupCityAutocomplete();
       loadTeammates();
       loadUtcPref();
+      load24hrPref();
       updateAllTimes();
       setInterval(updateAllTimes, 1000);
       
@@ -839,6 +847,17 @@
       const showUtc = document.getElementById('showUtc').checked;
       localStorage.setItem(UTC_PREF_KEY, showUtc);
       document.getElementById('timeCards').classList.toggle('hide-utc', !showUtc);
+    }
+
+    function load24hrPref() {
+      use24hr = localStorage.getItem(TIME_FORMAT_KEY) === 'true';
+      document.getElementById('use24hr').checked = use24hr;
+    }
+
+    function toggle24hr() {
+      use24hr = document.getElementById('use24hr').checked;
+      localStorage.setItem(TIME_FORMAT_KEY, use24hr);
+      updateAllTimes();
     }
 
     function setupCityAutocomplete() {
@@ -939,9 +958,9 @@
     function formatTime(date, tz) {
       return date.toLocaleTimeString('en-US', {
         timeZone: tz,
-        hour: 'numeric',
+        hour: use24hr ? '2-digit' : 'numeric',
         minute: '2-digit',
-        hour12: true
+        hour12: !use24hr
       });
     }
 
