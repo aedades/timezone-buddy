@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aedades.github.io/timezone-buddy/sitemap.xml
